@@ -1,0 +1,64 @@
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using AcaiWorkspace.Infrastructure.Persistence;
+
+namespace AcaiWorkspace.Api.Features.UserManagement.UpdateUser;
+
+public sealed class Handler : IRequestHandler<Command, Response?>
+{
+    private readonly AcaiWorkspaceDbContext _dbContext;
+
+    public Handler(AcaiWorkspaceDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task<Response?> Handle(Command request, CancellationToken cancellationToken)
+    {
+        var user = await _dbContext.Users
+            .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+
+        if (user is null)
+        {
+            return null;
+        }
+
+        var duplicateEmail = await _dbContext.Users
+            .AsNoTracking()
+            .AnyAsync(x => x.Id != request.Id && x.Email == request.Email, cancellationToken);
+
+        if (duplicateEmail)
+        {
+            throw new InvalidOperationException("A user with this email already exists.");
+        }
+
+        var duplicateUsername = await _dbContext.Users
+            .AsNoTracking()
+            .AnyAsync(x => x.Id != request.Id && x.Username == request.Username, cancellationToken);
+
+        if (duplicateUsername)
+        {
+            throw new InvalidOperationException("A user with this username already exists.");
+        }
+
+        user.FirstName = request.FirstName.Trim();
+        user.LastName = request.LastName.Trim();
+        user.Email = request.Email.Trim().ToLowerInvariant();
+        user.Username = request.Username.Trim();
+        user.ModifiedAt = DateTime.UtcNow;
+        user.ModifiedBy = request.ModifiedBy.Trim();
+        user.UpdateFullName();
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return new Response(
+            user.Id,
+            user.FirstName,
+            user.LastName,
+            user.FullName,
+            user.Email,
+            user.Username,
+            user.ModifiedAt,
+            user.ModifiedBy);
+    }
+}
