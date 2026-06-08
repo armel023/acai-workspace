@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AcaiWorkspace.Api/AcaiWorkspace.Api.csproj" />
+    <Project Path="src/AcaiWorkspace.Domain/AcaiWorkspace.Domain.csproj" />
+    <Project Path="src/AcaiWorkspace.Infrastructure/AcaiWorkspace.Infrastructure.csproj" />
+  </Folder>
+</Solution>

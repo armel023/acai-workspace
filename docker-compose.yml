@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: acaiworkspace
+    ports:
+      - "5432:5432"
+
+  seq:
+    image: datalust/seq
+    environment:
+      ACCEPT_EULA: Y
+    ports:
+      - "5341:80"
