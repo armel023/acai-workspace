@@ -314,15 +314,49 @@ Example:
 
 src/
 ├── features/
-├── components/
-├── hooks/
-├── services/
-├── stores/
-├── pages/
+└──components/
+└──hooks/
+└──services/
+└──stores/
+└──pages/
+└──schemas
 
 Reusable UI belongs in components.
 
 Feature-specific UI belongs in features.
+
+# Frontend Architecture
+
+Organize frontend by feature.
+
+Example:
+
+src/features/
+└──components/
+└──hooks/
+└──services/
+└──stores/
+└──pages/
+└──schemas
+
+Reusable UI belongs in components.
+
+Feature-specific UI belongs in features.
+
+Shared code (types, utils, constants) belongs in shared.
+
+Example:
+
+src/shared/
+├── components/
+├── config/
+├── constants/
+├── hooks/
+├── lib/
+├── stores/
+├── themes/
+├── types/
+├── utils/
 
 ---
 

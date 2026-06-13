@@ -6,7 +6,7 @@ Defines reusable frontend components.
 
 Reusable components belong in:
 
-src/components
+src/shared/components
 
 ---
 

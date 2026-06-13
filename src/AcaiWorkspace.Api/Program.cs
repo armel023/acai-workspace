@@ -1,6 +1,5 @@
 using Carter;
 using FluentValidation;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using AcaiWorkspace.Infrastructure.Persistence;
 
@@ -22,6 +21,8 @@ builder.Services.AddDbContext<AcaiWorkspaceDbContext>(options =>
         ?? "Host=localhost;Port=5432;Database=acaiworkspace;Username=postgres;Password=postgres"));
 
 var app = builder.Build();
+
+await DatabaseInitializer.MigrateAsync(app.Services);
 
 if (app.Environment.IsDevelopment())
 {

@@ -66,19 +66,25 @@ Markdown:
 ```text
 src/
 
-├── app/
-├── features/
-├── pages/
+features/
+└──components/
+└──hooks/
+└──services/
+└──stores/
+└──pages/
+└──schemas
+
+shared/
 ├── components/
-├── services/
+├── config/
+├── constants/
 ├── hooks/
+├── lib/
 ├── stores/
-├── layouts/
-├── routes/
+├── themes/
 ├── types/
 ├── utils/
-├── assets/
-└── theme/
+
 ```
 
 ---
