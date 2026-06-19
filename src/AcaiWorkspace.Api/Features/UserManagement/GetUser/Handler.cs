@@ -7,10 +7,10 @@ namespace AcaiWorkspace.Api.Features.UserManagement.GetUser;
 
 public sealed class Handler : IRequestHandler<Query, Response?>
 {
-    private readonly AcaiWorkspaceDbContext _dbContext;
+    private readonly AcaiDbContext _dbContext;
     private readonly IAuthorizationService _authorizationService;
 
-    public Handler(AcaiWorkspaceDbContext dbContext, IAuthorizationService authorizationService)
+    public Handler(AcaiDbContext dbContext, IAuthorizationService authorizationService)
     {
         _dbContext = dbContext;
         _authorizationService = authorizationService;
@@ -37,8 +37,8 @@ public sealed class Handler : IRequestHandler<Query, Response?>
                 x.FirstName,
                 x.LastName,
                 x.FullName,
-                x.Email,
-                x.Username,
+                x.Email ?? string.Empty,
+                x.UserName ?? string.Empty,
                 x.CreatedAt,
                 x.CreatedBy,
                 x.ModifiedAt,

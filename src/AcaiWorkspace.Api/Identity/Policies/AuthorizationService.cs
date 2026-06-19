@@ -1,4 +1,4 @@
-using AcaiWorkspace.Domain.Entities;
+using AcaiWorkspace.Domain.Entities.Identity;
 
 namespace AcaiWorkspace.Api.Identity.Policies;
 
@@ -18,7 +18,7 @@ public sealed class AuthorizationService : IAuthorizationService
         _permissionService.RequirePermission(Permissions.UserManagement.UsersCreate);
     }
 
-    public void EnsureCanReadUser(User user)
+    public void EnsureCanReadUser(AcaiUser user)
     {
         if (_permissionService.HasPermission(Permissions.UserManagement.UsersRead))
         {
@@ -33,7 +33,7 @@ public sealed class AuthorizationService : IAuthorizationService
         }
     }
 
-    public void EnsureCanUpdateUser(User user)
+    public void EnsureCanUpdateUser(AcaiUser user)
     {
         if (_permissionService.HasPermission(Permissions.UserManagement.UsersUpdate))
         {
@@ -48,7 +48,7 @@ public sealed class AuthorizationService : IAuthorizationService
         }
     }
 
-    public void EnsureCanDeleteUser(User user)
+    public void EnsureCanDeleteUser(AcaiUser user)
     {
         if (_permissionService.HasPermission(Permissions.UserManagement.UsersDelete))
         {

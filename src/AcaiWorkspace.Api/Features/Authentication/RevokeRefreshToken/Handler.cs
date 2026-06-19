@@ -7,10 +7,10 @@ namespace AcaiWorkspace.Api.Features.Authentication.RevokeRefreshToken;
 
 public sealed class Handler : IRequestHandler<Command, Response>
 {
-    private readonly AcaiIdentityDbContext _dbContext;
+    private readonly AcaiDbContext _dbContext;
     private readonly IJwtTokenService _jwtTokenService;
 
-    public Handler(AcaiIdentityDbContext dbContext, IJwtTokenService jwtTokenService)
+    public Handler(AcaiDbContext dbContext, IJwtTokenService jwtTokenService)
     {
         _dbContext = dbContext;
         _jwtTokenService = jwtTokenService;

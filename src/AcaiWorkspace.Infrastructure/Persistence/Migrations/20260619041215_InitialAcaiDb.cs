@@ -4,10 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace AcaiWorkspace.Infrastructure.Persistence.Migrations.Identity
+namespace AcaiWorkspace.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialAcaiIdentityInfrastructure : Migration
+    public partial class InitialAcaiDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,6 +17,12 @@ namespace AcaiWorkspace.Infrastructure.Persistence.Migrations.Identity
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    ModifiedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "text", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<string>(type: "text", nullable: true),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
@@ -31,9 +37,18 @@ namespace AcaiWorkspace.Infrastructure.Persistence.Migrations.Identity
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    FullName = table.Column<string>(type: "character varying(201)", maxLength: 201, nullable: false),
                     DisplayName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     BusinessEntityId = table.Column<Guid>(type: "uuid", nullable: true),
                     SubEntityId = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    ModifiedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "text", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<string>(type: "text", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -85,7 +100,13 @@ namespace AcaiWorkspace.Infrastructure.Persistence.Migrations.Identity
                     ExpiresAtUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedAtUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     RevokedAtUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ReplacedByTokenHash = table.Column<string>(type: "text", nullable: true)
+                    ReplacedByTokenHash = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    ModifiedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "text", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

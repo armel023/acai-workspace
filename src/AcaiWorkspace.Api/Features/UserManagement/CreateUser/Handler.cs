@@ -1,19 +1,19 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using AcaiWorkspace.Api.Identity.Policies;
-using AcaiWorkspace.Domain.Entities;
+using AcaiWorkspace.Domain.Entities.Identity;
 using AcaiWorkspace.Infrastructure.Persistence;
 
 namespace AcaiWorkspace.Api.Features.UserManagement.CreateUser;
 
 public sealed class Handler : IRequestHandler<Command, Response>
 {
-    private readonly AcaiWorkspaceDbContext _dbContext;
+    private readonly AcaiDbContext _dbContext;
     private readonly IAuthorizationService _authorizationService;
     private readonly ICurrentUser _currentUser;
 
     public Handler(
-        AcaiWorkspaceDbContext dbContext,
+        AcaiDbContext dbContext,
         IAuthorizationService authorizationService,
         ICurrentUser currentUser)
     {
@@ -37,27 +37,26 @@ public sealed class Handler : IRequestHandler<Command, Response>
 
         var usernameExists = await _dbContext.Users
             .AsNoTracking()
-            .AnyAsync(x => x.Username == request.Username, cancellationToken);
+            .AnyAsync(x => x.UserName == request.Username, cancellationToken);
 
         if (usernameExists)
         {
             throw new InvalidOperationException("A user with this username already exists.");
         }
 
-        var user = new User
+        var user = new AcaiUser
         {
             Id = Guid.NewGuid(),
             FirstName = request.FirstName.Trim(),
             LastName = request.LastName.Trim(),
             Email = request.Email.Trim().ToLowerInvariant(),
-            Username = request.Username.Trim(),
-            CreatedAt = DateTime.UtcNow,
+            UserName = request.Username.Trim(),
             CreatedBy = !string.IsNullOrWhiteSpace(_currentUser.UserName)
                 ? _currentUser.UserName
                 : request.CreatedBy?.Trim() ?? "system"
         };
 
-        user.UpdateFullName();
+        user.UpdateNames();
 
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -68,7 +67,7 @@ public sealed class Handler : IRequestHandler<Command, Response>
             user.LastName,
             user.FullName,
             user.Email,
-            user.Username,
+            user.UserName ?? string.Empty,
             user.CreatedAt,
             user.CreatedBy);
     }

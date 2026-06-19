@@ -23,12 +23,22 @@ builder.Services.AddCarter();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
-builder.Services.AddDbContext<AcaiWorkspaceDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-        ?? "Host=localhost;Port=5432;Database=acaiworkspace;Username=postgres;Password=postgres"));
+const string CorsPolicyName = "FrontendCors";
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? ["http://localhost:5173"];
 
-builder.Services.AddDbContext<AcaiIdentityDbContext>(options =>
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(CorsPolicyName, policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
+builder.Services.AddDbContext<AcaiDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
         ?? "Host=localhost;Port=5432;Database=acaiworkspace;Username=postgres;Password=postgres"));
@@ -49,7 +59,7 @@ builder.Services
         options.Password.RequiredLength = 10;
     })
     .AddRoles<AcaiRole>()
-    .AddEntityFrameworkStores<AcaiIdentityDbContext>()
+    .AddEntityFrameworkStores<AcaiDbContext>()
     .AddSignInManager<SignInManager<AcaiUser>>()
     .AddDefaultTokenProviders();
 
@@ -134,6 +144,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors(CorsPolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapCarter();

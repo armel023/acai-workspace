@@ -7,7 +7,7 @@ public sealed record Response(
     string FullName,
     string Email,
     string Username,
-    DateTime CreatedAt,
-    string CreatedBy,
-    DateTime? ModifiedAt,
+    DateTimeOffset? CreatedAt,
+    string? CreatedBy,
+    DateTimeOffset? ModifiedAt,
     string? ModifiedBy);

@@ -9,7 +9,7 @@ public static class DatabaseInitializer
         using var scope = services.CreateScope();
 
         var dbContext = scope.ServiceProvider
-            .GetRequiredService<AcaiWorkspaceDbContext>();
+            .GetRequiredService<AcaiDbContext>();
 
         await dbContext.Database.MigrateAsync();
     }

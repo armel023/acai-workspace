@@ -12,18 +12,18 @@ public sealed class Handler : IRequestHandler<Command, Response>
     private readonly UserManager<AcaiUser> _userManager;
     private readonly SignInManager<AcaiUser> _signInManager;
     private readonly IJwtTokenService _jwtTokenService;
-    private readonly AcaiIdentityDbContext _identityDbContext;
+    private readonly AcaiDbContext _dbContext;
 
     public Handler(
         UserManager<AcaiUser> userManager,
         SignInManager<AcaiUser> signInManager,
         IJwtTokenService jwtTokenService,
-        AcaiIdentityDbContext identityDbContext)
+        AcaiDbContext dbContext)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtTokenService = jwtTokenService;
-        _identityDbContext = identityDbContext;
+        _dbContext = dbContext;
     }
 
     public async Task<Response> Handle(Command request, CancellationToken cancellationToken)
@@ -51,7 +51,7 @@ public sealed class Handler : IRequestHandler<Command, Response>
         var refreshToken = _jwtTokenService.GenerateRefreshToken();
         var refreshTokenHash = _jwtTokenService.HashToken(refreshToken.Token);
 
-        var existingTokens = await _identityDbContext.RefreshTokens
+        var existingTokens = await _dbContext.RefreshTokens
             .Where(x => x.UserId == user.Id && x.RevokedAtUtc == null && x.ExpiresAtUtc > DateTime.UtcNow)
             .ToListAsync(cancellationToken);
 
@@ -60,7 +60,7 @@ public sealed class Handler : IRequestHandler<Command, Response>
             token.RevokedAtUtc = DateTime.UtcNow;
         }
 
-        _identityDbContext.RefreshTokens.Add(new AcaiRefreshToken
+        _dbContext.RefreshTokens.Add(new AcaiRefreshToken
         {
             Id = Guid.NewGuid(),
             UserId = user.Id,
@@ -69,7 +69,7 @@ public sealed class Handler : IRequestHandler<Command, Response>
             ExpiresAtUtc = refreshToken.ExpiresAtUtc
         });
 
-        await _identityDbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return new Response(
             accessToken.Token,

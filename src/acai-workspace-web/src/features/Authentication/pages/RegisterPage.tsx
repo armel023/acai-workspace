@@ -1,12 +1,9 @@
 import { useMemo, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import {
-  Alert,
   Box,
   Button,
   CircularProgress,
-  Checkbox,
-  FormControlLabel,
   IconButton,
   InputAdornment,
   LinearProgress,
@@ -18,13 +15,14 @@ import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
 import { useSnackbar } from "notistack";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { getApiErrorMessage } from "../../../shared/lib/apiClient";
 import { AuthLayout } from "../components/AuthLayout";
 import { AuthTextField } from "../components/AuthTextField";
+import { useRegister } from "../hooks/useRegister";
 import {
   registerSchema,
   type RegisterFormValues,
 } from "../schemas/registerSchema";
-import { registerWithDummyData } from "../services/authDemoService";
 
 function getPasswordStrength(password: string): number {
   const checks = [
@@ -41,6 +39,7 @@ function getPasswordStrength(password: string): number {
 export function RegisterPage() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
+  const registerMutation = useRegister();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -52,11 +51,11 @@ export function RegisterPage() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      fullName: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
-      acceptTerms: true,
     },
   });
 
@@ -64,23 +63,23 @@ export function RegisterPage() {
   const strength = useMemo(() => getPasswordStrength(password), [password]);
 
   const onSubmit = async (values: RegisterFormValues) => {
-    setIsSubmitting(true);
-
-    const result = await registerWithDummyData(
-      values.fullName,
-      values.email,
-      values.password,
-    );
-
-    if (!result.success) {
-      enqueueSnackbar(result.message, { variant: "error" });
+    try {
+      setIsSubmitting(true);
+      await registerMutation.mutateAsync({
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        password: values.password,
+      });
+      enqueueSnackbar("Registration successful. You can now sign in.", {
+        variant: "success",
+      });
+      navigate("/auth/login", { replace: true });
+    } catch (error) {
+      enqueueSnackbar(getApiErrorMessage(error), { variant: "error" });
+    } finally {
       setIsSubmitting(false);
-      return;
     }
-
-    enqueueSnackbar(result.message, { variant: "success" });
-    setIsSubmitting(false);
-    navigate("/auth/login", { replace: true });
   };
 
   const strengthPercent = (strength / 5) * 100;
@@ -91,24 +90,41 @@ export function RegisterPage() {
       subtitle="Register for secure access to Acai Workspace"
     >
       <Stack spacing={2.25} component="form" onSubmit={handleSubmit(onSubmit)}>
-        <Alert severity="success" sx={{ borderRadius: 2 }}>
-          Registration is running in UI demo mode. Data is stored in-memory
-          only.
-        </Alert>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+            gap: 2,
+          }}
+        >
+          <Controller
+            name="firstName"
+            control={control}
+            render={({ field }) => (
+              <AuthTextField
+                {...field}
+                label="First name"
+                autoComplete="given-name"
+                error={Boolean(errors.firstName)}
+                helperText={errors.firstName?.message}
+              />
+            )}
+          />
 
-        <Controller
-          name="fullName"
-          control={control}
-          render={({ field }) => (
-            <AuthTextField
-              {...field}
-              label="Full name"
-              autoComplete="name"
-              error={Boolean(errors.fullName)}
-              helperText={errors.fullName?.message}
-            />
-          )}
-        />
+          <Controller
+            name="lastName"
+            control={control}
+            render={({ field }) => (
+              <AuthTextField
+                {...field}
+                label="Last name"
+                autoComplete="family-name"
+                error={Boolean(errors.lastName)}
+                helperText={errors.lastName?.message}
+              />
+            )}
+          />
+        </Box>
 
         <Controller
           name="email"
@@ -197,27 +213,6 @@ export function RegisterPage() {
             />
           )}
         />
-
-        <Controller
-          name="acceptTerms"
-          control={control}
-          render={({ field }) => (
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={field.value}
-                  onChange={(event) => field.onChange(event.target.checked)}
-                />
-              }
-              label="I confirm compliance with data handling and acceptable use policies"
-            />
-          )}
-        />
-        {errors.acceptTerms && (
-          <Typography color="error" variant="caption">
-            {errors.acceptTerms.message}
-          </Typography>
-        )}
 
         <Button
           type="submit"

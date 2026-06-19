@@ -10,8 +10,8 @@ public sealed class Endpoint : ICarterModule
     {
         app.MapGet("/api/users", async (
                 string? search,
-                DateTime? createdAtFrom,
-                DateTime? createdAtTo,
+            DateTimeOffset? createdAtFrom,
+            DateTimeOffset? createdAtTo,
                 string? sortBy,
                 string? direction,
                 int page,

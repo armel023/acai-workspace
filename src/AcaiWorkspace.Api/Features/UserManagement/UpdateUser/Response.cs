@@ -7,5 +7,5 @@ public sealed record Response(
     string FullName,
     string Email,
     string Username,
-    DateTime? ModifiedAt,
+    DateTimeOffset? ModifiedAt,
     string? ModifiedBy);

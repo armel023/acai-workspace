@@ -9,12 +9,12 @@ namespace AcaiWorkspace.Api.Identity;
 
 public sealed class IdentitySeeder
 {
-    private readonly AcaiIdentityDbContext _dbContext;
+    private readonly AcaiDbContext _dbContext;
     private readonly RoleManager<AcaiRole> _roleManager;
     private readonly UserManager<AcaiUser> _userManager;
 
     public IdentitySeeder(
-        AcaiIdentityDbContext dbContext,
+        AcaiDbContext dbContext,
         RoleManager<AcaiRole> roleManager,
         UserManager<AcaiUser> userManager)
     {
@@ -68,12 +68,16 @@ public sealed class IdentitySeeder
             user = new AcaiUser
             {
                 Id = Guid.NewGuid(),
+                FirstName = "System",
+                LastName = "Administrator",
+                FullName = "System Administrator",
                 UserName = seedUsername,
                 NormalizedUserName = seedUsername.ToUpperInvariant(),
                 Email = seedEmail,
                 NormalizedEmail = seedEmail.ToUpperInvariant(),
                 EmailConfirmed = true,
-                DisplayName = "System Administrator"
+                DisplayName = "System Administrator",
+                CreatedBy = "system"
             };
 
             var result = await _userManager.CreateAsync(user, seedPassword);

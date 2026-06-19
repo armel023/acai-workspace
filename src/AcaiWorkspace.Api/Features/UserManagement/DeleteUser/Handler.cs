@@ -7,13 +7,18 @@ namespace AcaiWorkspace.Api.Features.UserManagement.DeleteUser;
 
 public sealed class Handler : IRequestHandler<Command, Response>
 {
-    private readonly AcaiWorkspaceDbContext _dbContext;
+    private readonly AcaiDbContext _dbContext;
     private readonly IAuthorizationService _authorizationService;
+    private readonly ICurrentUser _currentUser;
 
-    public Handler(AcaiWorkspaceDbContext dbContext, IAuthorizationService authorizationService)
+    public Handler(
+        AcaiDbContext dbContext,
+        IAuthorizationService authorizationService,
+        ICurrentUser currentUser)
     {
         _dbContext = dbContext;
         _authorizationService = authorizationService;
+        _currentUser = currentUser;
     }
 
     public async Task<Response> Handle(Command request, CancellationToken cancellationToken)
@@ -28,7 +33,10 @@ public sealed class Handler : IRequestHandler<Command, Response>
 
         _authorizationService.EnsureCanDeleteUser(user);
 
-        _dbContext.Users.Remove(user);
+        user.DeletedAt = DateTimeOffset.UtcNow;
+        user.DeletedBy = !string.IsNullOrWhiteSpace(_currentUser.UserName)
+            ? _currentUser.UserName
+            : "system";
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return new Response(true);

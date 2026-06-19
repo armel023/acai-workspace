@@ -2,10 +2,16 @@ import { z } from "zod";
 
 export const registerSchema = z
   .object({
-    fullName: z
+    firstName: z
       .string()
-      .min(3, "Full name must contain at least 3 characters")
-      .max(80, "Full name is too long"),
+      .trim()
+      .min(2, "First name must contain at least 2 characters")
+      .max(100, "First name must not exceed 100 characters"),
+    lastName: z
+      .string()
+      .trim()
+      .min(2, "Last name must contain at least 2 characters")
+      .max(100, "Last name must not exceed 100 characters"),
     email: z.string().email("Enter a valid work email address"),
     password: z
       .string()
@@ -15,9 +21,6 @@ export const registerSchema = z
       .regex(/\d/, "Password must include a number")
       .regex(/[^A-Za-z0-9]/, "Password must include a special character"),
     confirmPassword: z.string(),
-    acceptTerms: z.literal(true, {
-      error: "You must accept the terms to continue",
-    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],

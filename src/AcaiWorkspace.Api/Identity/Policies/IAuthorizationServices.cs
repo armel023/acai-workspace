@@ -1,4 +1,4 @@
-using AcaiWorkspace.Domain.Entities;
+using AcaiWorkspace.Domain.Entities.Identity;
 
 namespace AcaiWorkspace.Api.Identity.Policies;
 
@@ -18,7 +18,7 @@ public interface IScopeService
 public interface IAuthorizationService
 {
     void EnsureCanCreateUser();
-    void EnsureCanReadUser(User user);
-    void EnsureCanUpdateUser(User user);
-    void EnsureCanDeleteUser(User user);
+    void EnsureCanReadUser(AcaiUser user);
+    void EnsureCanUpdateUser(AcaiUser user);
+    void EnsureCanDeleteUser(AcaiUser user);
 }

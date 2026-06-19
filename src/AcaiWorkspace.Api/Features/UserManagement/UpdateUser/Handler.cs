@@ -7,12 +7,12 @@ namespace AcaiWorkspace.Api.Features.UserManagement.UpdateUser;
 
 public sealed class Handler : IRequestHandler<Command, Response?>
 {
-    private readonly AcaiWorkspaceDbContext _dbContext;
+    private readonly AcaiDbContext _dbContext;
     private readonly IAuthorizationService _authorizationService;
     private readonly ICurrentUser _currentUser;
 
     public Handler(
-        AcaiWorkspaceDbContext dbContext,
+        AcaiDbContext dbContext,
         IAuthorizationService authorizationService,
         ICurrentUser currentUser)
     {
@@ -44,7 +44,7 @@ public sealed class Handler : IRequestHandler<Command, Response?>
 
         var duplicateUsername = await _dbContext.Users
             .AsNoTracking()
-            .AnyAsync(x => x.Id != request.Id && x.Username == request.Username, cancellationToken);
+            .AnyAsync(x => x.Id != request.Id && x.UserName == request.Username, cancellationToken);
 
         if (duplicateUsername)
         {
@@ -54,12 +54,11 @@ public sealed class Handler : IRequestHandler<Command, Response?>
         user.FirstName = request.FirstName.Trim();
         user.LastName = request.LastName.Trim();
         user.Email = request.Email.Trim().ToLowerInvariant();
-        user.Username = request.Username.Trim();
-        user.ModifiedAt = DateTime.UtcNow;
+        user.UserName = request.Username.Trim();
         user.ModifiedBy = !string.IsNullOrWhiteSpace(_currentUser.UserName)
             ? _currentUser.UserName
             : request.ModifiedBy?.Trim() ?? "system";
-        user.UpdateFullName();
+        user.UpdateNames();
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -69,7 +68,7 @@ public sealed class Handler : IRequestHandler<Command, Response?>
             user.LastName,
             user.FullName,
             user.Email,
-            user.Username,
+            user.UserName ?? string.Empty,
             user.ModifiedAt,
             user.ModifiedBy);
     }

@@ -7,12 +7,12 @@ namespace AcaiWorkspace.Api.Features.UserManagement.SearchUser;
 
 public sealed class Handler : IRequestHandler<Query, Response>
 {
-    private readonly AcaiWorkspaceDbContext _dbContext;
+    private readonly AcaiDbContext _dbContext;
     private readonly IPermissionService _permissionService;
     private readonly ICurrentUser _currentUser;
 
     public Handler(
-        AcaiWorkspaceDbContext dbContext,
+        AcaiDbContext dbContext,
         IPermissionService permissionService,
         ICurrentUser currentUser)
     {
@@ -46,8 +46,8 @@ public sealed class Handler : IRequestHandler<Query, Response>
             var search = request.Search.Trim().ToLowerInvariant();
             usersQuery = usersQuery.Where(x =>
                 x.FullName.ToLower().Contains(search)
-                || x.Email.ToLower().Contains(search)
-                || x.Username.ToLower().Contains(search));
+                || (x.Email ?? string.Empty).ToLower().Contains(search)
+                || (x.UserName ?? string.Empty).ToLower().Contains(search));
         }
 
         if (request.CreatedAtFrom.HasValue)
@@ -84,8 +84,8 @@ public sealed class Handler : IRequestHandler<Query, Response>
                 x.FirstName,
                 x.LastName,
                 x.FullName,
-                x.Email,
-                x.Username,
+                x.Email ?? string.Empty,
+                x.UserName ?? string.Empty,
                 x.CreatedAt,
                 x.CreatedBy,
                 x.ModifiedAt,

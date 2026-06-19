@@ -95,18 +95,10 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
             </Typography>
           </Stack>
 
-          <Stack spacing={1} sx={{ zIndex: 1 }}>
-            <Typography
-              variant="caption"
-              sx={{ color: "rgba(236, 254, 255, 0.82)" }}
-            >
-              Demo mode for frontend validation
-            </Typography>
-            <Typography sx={{ color: "rgba(236, 254, 255, 0.95)" }}>
-              No backend API is connected yet. You can use preloaded dummy users
-              or register a new one.
-            </Typography>
-          </Stack>
+          <Typography sx={{ color: "rgba(236, 254, 255, 0.92)", zIndex: 1 }}>
+            Single-sign-on ready architecture with enterprise access controls
+            and auditable identity events.
+          </Typography>
         </Box>
 
         <Box
