@@ -1,5 +1,6 @@
 using Carter;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AcaiWorkspace.Api.Features.UserManagement.GetUser;
 
@@ -12,6 +13,7 @@ public sealed class Endpoint : ICarterModule
                 var result = await sender.Send(new Query(id), ct);
                 return result is null ? Results.NotFound() : Results.Ok(result);
             })
+            .RequireAuthorization()
             .WithName("GetUser")
             .WithTags("User Management")
             .WithSummary("Get a user by id")

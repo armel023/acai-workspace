@@ -8,4 +8,4 @@ public sealed record Command(
     string LastName,
     string Email,
     string Username,
-    string ModifiedBy) : IRequest<Response?>;
+    string? ModifiedBy) : IRequest<Response?>;

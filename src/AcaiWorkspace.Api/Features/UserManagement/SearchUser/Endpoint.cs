@@ -1,5 +1,6 @@
 using Carter;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AcaiWorkspace.Api.Features.UserManagement.SearchUser;
 
@@ -24,6 +25,7 @@ public sealed class Endpoint : ICarterModule
 
                 return Results.Ok(result);
             })
+            .RequireAuthorization()
             .WithName("SearchUser")
             .WithTags("User Management")
             .WithSummary("Search users by full name, email, username, with filtering, sorting, and pagination")

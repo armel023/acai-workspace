@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using AcaiWorkspace.Api.Identity.Policies;
 using AcaiWorkspace.Infrastructure.Persistence;
 
 namespace AcaiWorkspace.Api.Features.UserManagement.UpdateUser;
@@ -7,10 +8,17 @@ namespace AcaiWorkspace.Api.Features.UserManagement.UpdateUser;
 public sealed class Handler : IRequestHandler<Command, Response?>
 {
     private readonly AcaiWorkspaceDbContext _dbContext;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly ICurrentUser _currentUser;
 
-    public Handler(AcaiWorkspaceDbContext dbContext)
+    public Handler(
+        AcaiWorkspaceDbContext dbContext,
+        IAuthorizationService authorizationService,
+        ICurrentUser currentUser)
     {
         _dbContext = dbContext;
+        _authorizationService = authorizationService;
+        _currentUser = currentUser;
     }
 
     public async Task<Response?> Handle(Command request, CancellationToken cancellationToken)
@@ -22,6 +30,8 @@ public sealed class Handler : IRequestHandler<Command, Response?>
         {
             return null;
         }
+
+        _authorizationService.EnsureCanUpdateUser(user);
 
         var duplicateEmail = await _dbContext.Users
             .AsNoTracking()
@@ -46,7 +56,9 @@ public sealed class Handler : IRequestHandler<Command, Response?>
         user.Email = request.Email.Trim().ToLowerInvariant();
         user.Username = request.Username.Trim();
         user.ModifiedAt = DateTime.UtcNow;
-        user.ModifiedBy = request.ModifiedBy.Trim();
+        user.ModifiedBy = !string.IsNullOrWhiteSpace(_currentUser.UserName)
+            ? _currentUser.UserName
+            : request.ModifiedBy?.Trim() ?? "system";
         user.UpdateFullName();
 
         await _dbContext.SaveChangesAsync(cancellationToken);

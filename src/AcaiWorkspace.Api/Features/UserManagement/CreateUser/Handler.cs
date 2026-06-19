@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using AcaiWorkspace.Api.Identity.Policies;
 using AcaiWorkspace.Domain.Entities;
 using AcaiWorkspace.Infrastructure.Persistence;
 
@@ -8,14 +9,23 @@ namespace AcaiWorkspace.Api.Features.UserManagement.CreateUser;
 public sealed class Handler : IRequestHandler<Command, Response>
 {
     private readonly AcaiWorkspaceDbContext _dbContext;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly ICurrentUser _currentUser;
 
-    public Handler(AcaiWorkspaceDbContext dbContext)
+    public Handler(
+        AcaiWorkspaceDbContext dbContext,
+        IAuthorizationService authorizationService,
+        ICurrentUser currentUser)
     {
         _dbContext = dbContext;
+        _authorizationService = authorizationService;
+        _currentUser = currentUser;
     }
 
     public async Task<Response> Handle(Command request, CancellationToken cancellationToken)
     {
+        _authorizationService.EnsureCanCreateUser();
+
         var emailExists = await _dbContext.Users
             .AsNoTracking()
             .AnyAsync(x => x.Email == request.Email, cancellationToken);
@@ -42,7 +52,9 @@ public sealed class Handler : IRequestHandler<Command, Response>
             Email = request.Email.Trim().ToLowerInvariant(),
             Username = request.Username.Trim(),
             CreatedAt = DateTime.UtcNow,
-            CreatedBy = request.CreatedBy.Trim()
+            CreatedBy = !string.IsNullOrWhiteSpace(_currentUser.UserName)
+                ? _currentUser.UserName
+                : request.CreatedBy?.Trim() ?? "system"
         };
 
         user.UpdateFullName();

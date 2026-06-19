@@ -26,7 +26,6 @@ public sealed class Validator : AbstractValidator<Command>
             .MaximumLength(100);
 
         RuleFor(x => x.ModifiedBy)
-            .NotEmpty()
             .MaximumLength(100);
     }
 }

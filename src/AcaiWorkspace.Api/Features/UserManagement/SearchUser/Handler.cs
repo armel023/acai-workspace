@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using AcaiWorkspace.Api.Identity.Policies;
 using AcaiWorkspace.Infrastructure.Persistence;
 
 namespace AcaiWorkspace.Api.Features.UserManagement.SearchUser;
@@ -7,10 +8,17 @@ namespace AcaiWorkspace.Api.Features.UserManagement.SearchUser;
 public sealed class Handler : IRequestHandler<Query, Response>
 {
     private readonly AcaiWorkspaceDbContext _dbContext;
+    private readonly IPermissionService _permissionService;
+    private readonly ICurrentUser _currentUser;
 
-    public Handler(AcaiWorkspaceDbContext dbContext)
+    public Handler(
+        AcaiWorkspaceDbContext dbContext,
+        IPermissionService permissionService,
+        ICurrentUser currentUser)
     {
         _dbContext = dbContext;
+        _permissionService = permissionService;
+        _currentUser = currentUser;
     }
 
     public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
@@ -18,6 +26,20 @@ public sealed class Handler : IRequestHandler<Query, Response>
         var usersQuery = _dbContext.Users
             .AsNoTracking()
             .AsQueryable();
+
+        var canReadAllUsers = _permissionService.HasPermission(Permissions.UserManagement.UsersRead);
+        if (!canReadAllUsers)
+        {
+            _permissionService.RequirePermission(Permissions.UserManagement.UserRead);
+
+            if (!_currentUser.UserId.HasValue)
+            {
+                throw new UnauthorizedAccessException("Forbidden: missing authenticated user context.");
+            }
+
+            var currentUserId = _currentUser.UserId.Value;
+            usersQuery = usersQuery.Where(x => x.Id == currentUserId);
+        }
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {

@@ -7,4 +7,4 @@ public sealed record Command(
     string LastName,
     string Email,
     string Username,
-    string CreatedBy) : IRequest<Response>;
+    string? CreatedBy) : IRequest<Response>;

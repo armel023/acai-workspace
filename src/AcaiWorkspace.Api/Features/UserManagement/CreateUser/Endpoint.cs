@@ -1,5 +1,6 @@
 using Carter;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AcaiWorkspace.Api.Features.UserManagement.CreateUser;
 
@@ -12,6 +13,7 @@ public sealed class Endpoint : ICarterModule
                 var result = await sender.Send(command, ct);
                 return Results.Created($"/api/users/{result.Id}", result);
             })
+            .RequireAuthorization()
             .WithName("CreateUser")
             .WithTags("User Management")
             .WithSummary("Create a new user")
