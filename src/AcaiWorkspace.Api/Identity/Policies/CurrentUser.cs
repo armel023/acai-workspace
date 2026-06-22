@@ -28,20 +28,20 @@ public sealed class CurrentUser : ICurrentUser
 
     public string Email => Principal?.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
 
-    public Guid? BusinessEntityId
+    public Guid? ActiveBusinessEntityId
     {
         get
         {
-            var raw = Principal?.FindFirstValue(AcaiClaimTypes.BusinessEntityId);
+            var raw = Principal?.FindFirstValue(AcaiClaimTypes.ActiveBusinessEntityId);
             return Guid.TryParse(raw, out var value) ? value : null;
         }
     }
 
-    public Guid? SubEntityId
+    public Guid? ActiveSubEntityId
     {
         get
         {
-            var raw = Principal?.FindFirstValue(AcaiClaimTypes.SubEntityId);
+            var raw = Principal?.FindFirstValue(AcaiClaimTypes.ActiveSubEntityId);
             return Guid.TryParse(raw, out var value) ? value : null;
         }
     }

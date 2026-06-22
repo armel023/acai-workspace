@@ -2,6 +2,8 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { LoginPage } from "./features/Authentication/pages/LoginPage";
 import { RegisterPage } from "./features/Authentication/pages/RegisterPage";
 import { DashboardPage } from "./features/Dashboard/pages/DashboardPage";
+import { OrganizationManagementPage } from "./features/organizationManagement/pages/OrganizationManagementPage";
+import { UserManagementPage } from "./features/userManagement/pages/UserManagementPage";
 import { AppShell } from "./shared/components/AppShell";
 import { ComingSoonPage } from "./shared/components/ComingSoonPage";
 
@@ -76,14 +78,10 @@ function App() {
             />
           }
         />
+        <Route path="/user-management" element={<UserManagementPage />} />
         <Route
-          path="/user-management"
-          element={
-            <ComingSoonPage
-              title="User Management"
-              description="Manage users, roles, and workspace access policies for secure enterprise operations."
-            />
-          }
+          path="/organization-management"
+          element={<OrganizationManagementPage />}
         />
       </Route>
 

@@ -1,5 +1,6 @@
 using AcaiWorkspace.Domain.Abstractions;
 using AcaiWorkspace.Domain.Entities.Identity;
+using AcaiWorkspace.Domain.Entities.Organization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -14,28 +15,15 @@ public sealed class AcaiDbContext : IdentityDbContext<AcaiUser, AcaiRole, Guid>
     }
 
     public DbSet<AcaiRefreshToken> RefreshTokens => Set<AcaiRefreshToken>();
+    public DbSet<BusinessEntity> BusinessEntities => Set<BusinessEntity>();
+    public DbSet<SubEntity> SubEntities => Set<SubEntity>();
+    public DbSet<AcaiPermission> Permissions => Set<AcaiPermission>();
+    public DbSet<AcaiRolePermission> RolePermissions => Set<AcaiRolePermission>();
+    public DbSet<UserAssignment> UserAssignments => Set<UserAssignment>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
-        builder.Entity<AcaiUser>(entity =>
-        {
-            entity.ToTable("acai_users");
-            entity.Property(x => x.FirstName).HasMaxLength(100).IsRequired();
-            entity.Property(x => x.LastName).HasMaxLength(100).IsRequired();
-            entity.Property(x => x.FullName).HasMaxLength(201).IsRequired();
-            entity.Property(x => x.DisplayName).HasMaxLength(200);
-            entity.Property(x => x.BusinessEntityId);
-            entity.Property(x => x.SubEntityId);
-            entity.HasQueryFilter(x => x.DeletedAt == null);
-        });
-
-        builder.Entity<AcaiRole>(entity =>
-        {
-            entity.ToTable("acai_roles");
-            entity.HasQueryFilter(x => x.DeletedAt == null);
-        });
 
         builder.Entity<IdentityUserRole<Guid>>().ToTable("acai_user_roles");
         builder.Entity<IdentityUserClaim<Guid>>().ToTable("acai_user_claims");
@@ -43,18 +31,7 @@ public sealed class AcaiDbContext : IdentityDbContext<AcaiUser, AcaiRole, Guid>
         builder.Entity<IdentityRoleClaim<Guid>>().ToTable("acai_role_claims");
         builder.Entity<IdentityUserToken<Guid>>().ToTable("acai_user_tokens");
 
-        builder.Entity<AcaiRefreshToken>(entity =>
-        {
-            entity.ToTable("acai_refresh_tokens");
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.TokenHash).HasMaxLength(128).IsRequired();
-            entity.HasIndex(x => x.TokenHash).IsUnique();
-            entity.HasQueryFilter(x => x.DeletedAt == null && x.User.DeletedAt == null);
-            entity.HasOne(x => x.User)
-                .WithMany()
-                .HasForeignKey(x => x.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
+        builder.ApplyConfigurationsFromAssembly(typeof(AcaiDbContext).Assembly);
     }
 
     public override int SaveChanges()

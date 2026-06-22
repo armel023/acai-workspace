@@ -22,6 +22,43 @@ namespace AcaiWorkspace.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Identity.AcaiPermission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("acai_permissions", (string)null);
+                });
+
             modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Identity.AcaiRefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -121,6 +158,21 @@ namespace AcaiWorkspace.Infrastructure.Persistence.Migrations
                     b.ToTable("acai_roles", (string)null);
                 });
 
+            modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Identity.AcaiRolePermission", b =>
+                {
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PermissionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("RoleId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.ToTable("acai_role_permissions", (string)null);
+                });
+
             modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Identity.AcaiUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -129,9 +181,6 @@ namespace AcaiWorkspace.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
-
-                    b.Property<Guid?>("BusinessEntityId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -208,9 +257,6 @@ namespace AcaiWorkspace.Infrastructure.Persistence.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("SubEntityId")
-                        .HasColumnType("uuid");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -228,6 +274,165 @@ namespace AcaiWorkspace.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("acai_users", (string)null);
+                });
+
+            modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Organization.BusinessEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("acai_business_entities", (string)null);
+                });
+
+            modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Organization.SubEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BusinessEntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessEntityId", "Code")
+                        .IsUnique();
+
+                    b.ToTable("acai_sub_entities", (string)null);
+                });
+
+            modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Organization.UserAssignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("AssignedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("AssignedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("BusinessEntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("SubEntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedByUserId");
+
+                    b.HasIndex("BusinessEntityId");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("SubEntityId");
+
+                    b.HasIndex("UserId", "BusinessEntityId");
+
+                    b.HasIndex("UserId", "SubEntityId");
+
+                    b.ToTable("acai_user_assignments", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -344,6 +549,74 @@ namespace AcaiWorkspace.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Identity.AcaiRolePermission", b =>
+                {
+                    b.HasOne("AcaiWorkspace.Domain.Entities.Identity.AcaiPermission", "Permission")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AcaiWorkspace.Domain.Entities.Identity.AcaiRole", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Organization.SubEntity", b =>
+                {
+                    b.HasOne("AcaiWorkspace.Domain.Entities.Organization.BusinessEntity", "BusinessEntity")
+                        .WithMany("SubEntities")
+                        .HasForeignKey("BusinessEntityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BusinessEntity");
+                });
+
+            modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Organization.UserAssignment", b =>
+                {
+                    b.HasOne("AcaiWorkspace.Domain.Entities.Identity.AcaiUser", null)
+                        .WithMany()
+                        .HasForeignKey("AssignedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("AcaiWorkspace.Domain.Entities.Organization.BusinessEntity", "BusinessEntity")
+                        .WithMany()
+                        .HasForeignKey("BusinessEntityId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AcaiWorkspace.Domain.Entities.Identity.AcaiRole", "Role")
+                        .WithMany("Assignments")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AcaiWorkspace.Domain.Entities.Organization.SubEntity", "SubEntity")
+                        .WithMany()
+                        .HasForeignKey("SubEntityId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AcaiWorkspace.Domain.Entities.Identity.AcaiUser", "User")
+                        .WithMany("Assignments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BusinessEntity");
+
+                    b.Navigation("Role");
+
+                    b.Navigation("SubEntity");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("AcaiWorkspace.Domain.Entities.Identity.AcaiRole", null)
@@ -393,6 +666,28 @@ namespace AcaiWorkspace.Infrastructure.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Identity.AcaiPermission", b =>
+                {
+                    b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Identity.AcaiRole", b =>
+                {
+                    b.Navigation("Assignments");
+
+                    b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Identity.AcaiUser", b =>
+                {
+                    b.Navigation("Assignments");
+                });
+
+            modelBuilder.Entity("AcaiWorkspace.Domain.Entities.Organization.BusinessEntity", b =>
+                {
+                    b.Navigation("SubEntities");
                 });
 #pragma warning restore 612, 618
         }

@@ -17,8 +17,8 @@ public sealed class ScopeService : IScopeService
             return true;
         }
 
-        return _currentUser.BusinessEntityId.HasValue
-               && _currentUser.BusinessEntityId.Value == businessEntityId;
+         return _currentUser.ActiveBusinessEntityId.HasValue
+             && _currentUser.ActiveBusinessEntityId.Value == businessEntityId;
     }
 
     public bool IsSameSubEntity(Guid subEntityId)
@@ -29,8 +29,8 @@ public sealed class ScopeService : IScopeService
             return true;
         }
 
-        return _currentUser.SubEntityId.HasValue
-               && _currentUser.SubEntityId.Value == subEntityId;
+         return _currentUser.ActiveSubEntityId.HasValue
+             && _currentUser.ActiveSubEntityId.Value == subEntityId;
     }
 
     public bool IsOwner(Guid ownerId)

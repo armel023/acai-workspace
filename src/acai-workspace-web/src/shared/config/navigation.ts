@@ -68,6 +68,14 @@ export const appNavigation: AppNavItem[] = [
     label: "User Management",
     path: "/user-management",
     description: "Identity and access administration for workspace operators",
-    isImplemented: false,
+    isImplemented: true,
+  },
+  {
+    key: "organization-management",
+    label: "Organization Management",
+    path: "/organization-management",
+    description:
+      "Business and sub-entity administration with controlled hierarchy",
+    isImplemented: true,
   },
 ];

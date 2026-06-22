@@ -6,8 +6,8 @@ public interface ICurrentUser
     Guid? UserId { get; }
     string UserName { get; }
     string Email { get; }
-    Guid? BusinessEntityId { get; }
-    Guid? SubEntityId { get; }
+    Guid? ActiveBusinessEntityId { get; }
+    Guid? ActiveSubEntityId { get; }
     IReadOnlyCollection<string> Roles { get; }
     IReadOnlyCollection<string> Permissions { get; }
 }

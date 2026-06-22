@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using AcaiWorkspace.Domain.Abstractions;
+using AcaiWorkspace.Domain.Entities.Organization;
 
 namespace AcaiWorkspace.Domain.Entities.Identity;
 
@@ -9,8 +10,7 @@ public sealed class AcaiUser : IdentityUser<Guid>, IAuditEntity
     public string LastName { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
-    public Guid? BusinessEntityId { get; set; }
-    public Guid? SubEntityId { get; set; }
+    public ICollection<UserAssignment> Assignments { get; set; } = new List<UserAssignment>();
 
     public DateTimeOffset? CreatedAt { get; set; }
     public string? CreatedBy { get; set; }

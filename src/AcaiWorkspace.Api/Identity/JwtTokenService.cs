@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using AcaiWorkspace.Api.Identity.Policies;
@@ -38,6 +39,14 @@ public sealed class JwtTokenService : IJwtTokenService
         var expiresAt = now.AddMinutes(_jwtOptions.AccessTokenMinutes);
         var roles = await _userManager.GetRolesAsync(user);
         var permissionClaims = await _userManager.GetClaimsAsync(user);
+        var activeAssignment = await _userManager.Users
+            .AsNoTracking()
+            .Where(x => x.Id == user.Id)
+            .SelectMany(x => x.Assignments)
+            .Where(x => x.IsActive && x.DeletedAt == null)
+            .OrderByDescending(x => x.AssignedAtUtc)
+            .Select(x => new { x.BusinessEntityId, x.SubEntityId })
+            .FirstOrDefaultAsync(cancellationToken);
 
         var claims = new List<Claim>
         {
@@ -47,8 +56,8 @@ public sealed class JwtTokenService : IJwtTokenService
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.UserName ?? string.Empty),
             new(ClaimTypes.Email, user.Email ?? string.Empty),
-            new(AcaiClaimTypes.BusinessEntityId, user.BusinessEntityId?.ToString() ?? string.Empty),
-            new(AcaiClaimTypes.SubEntityId, user.SubEntityId?.ToString() ?? string.Empty)
+            new(AcaiClaimTypes.ActiveBusinessEntityId, activeAssignment?.BusinessEntityId.ToString() ?? string.Empty),
+            new(AcaiClaimTypes.ActiveSubEntityId, activeAssignment?.SubEntityId?.ToString() ?? string.Empty)
         };
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));

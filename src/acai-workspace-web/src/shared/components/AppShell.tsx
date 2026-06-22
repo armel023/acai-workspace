@@ -28,6 +28,7 @@ import ImageSearchRoundedIcon from "@mui/icons-material/ImageSearchRounded";
 import SummarizeRoundedIcon from "@mui/icons-material/SummarizeRounded";
 import Diversity3RoundedIcon from "@mui/icons-material/Diversity3Rounded";
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
+import AccountTreeRoundedIcon from "@mui/icons-material/AccountTreeRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import { appNavigation } from "../config/navigation";
@@ -54,6 +55,8 @@ function getNavIcon(key: string): ReactElement {
       return <Diversity3RoundedIcon fontSize="small" />;
     case "user-management":
       return <GroupRoundedIcon fontSize="small" />;
+    case "organization-management":
+      return <AccountTreeRoundedIcon fontSize="small" />;
     default:
       return <AutoAwesomeRoundedIcon fontSize="small" />;
   }
@@ -93,25 +96,8 @@ export function AppShell() {
             <Typography sx={{ fontWeight: 700, lineHeight: 1.2 }}>
               Acai Workspace
             </Typography>
-            <Typography
-              variant="caption"
-              sx={{ color: "rgba(230,255,251,0.8)" }}
-            >
-              Enterprise AI Platform
-            </Typography>
           </Box>
         </Stack>
-
-        <Chip
-          label="Platform Navigation"
-          size="small"
-          sx={{
-            width: "fit-content",
-            bgcolor: "rgba(230,255,251,0.14)",
-            border: "1px solid rgba(230,255,251,0.22)",
-            color: "#e6fffb",
-          }}
-        />
       </Stack>
 
       <Divider sx={{ borderColor: "rgba(230,255,251,0.12)" }} />
